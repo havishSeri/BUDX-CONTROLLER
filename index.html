@@ -9,30 +9,32 @@
 
       body {
         overflow: hidden;
-        background: #0a0a0a;
+        background: #080808;
         font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
       }
 
       #arm-container { width: 100vw; height: 100vh; position: relative; }
 
-      #arm-canvas {
-        display: block; width: 100%; height: 100%;
-        cursor: grab;
-      }
+      #arm-canvas { display: block; width: 100%; height: 100%; cursor: grab; }
       #arm-canvas:active { cursor: grabbing; }
 
-      /* ── Panel ── */
-      #arm-ui {
-        position: absolute; top: 20px; left: 20px;
-        background: rgba(8, 8, 8, 0.90);
-        backdrop-filter: blur(14px);
-        border: 1px solid rgba(255,102,0,0.22);
+      /* ── Shared panel style ── */
+      .panel {
+        position: absolute;
+        background: rgba(6, 6, 6, 0.92);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255,102,0,0.2);
         border-radius: 10px;
+        color: #e8ddd0;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.8), 0 8px 32px rgba(0,0,0,0.7), 0 0 40px rgba(255,102,0,0.04);
+      }
+
+      /* ── Joint control panel ── */
+      #arm-ui {
+        top: 20px; left: 20px;
         padding: 16px 18px;
         min-width: 220px;
-        color: #e8ddd0;
         z-index: 10;
-        box-shadow: 0 0 0 1px rgba(0,0,0,0.7), 0 8px 32px rgba(0,0,0,0.7), 0 0 40px rgba(255,102,0,0.04);
       }
 
       .ui-title {
@@ -50,42 +52,32 @@
       }
       @keyframes pulse {
         0%,100% { opacity:1; box-shadow: 0 0 8px #ff6600; }
-        50%      { opacity:.25; box-shadow: 0 0 2px #ff6600; }
+        50%      { opacity:.2; box-shadow: 0 0 2px #ff6600; }
       }
 
-      /* ── Joint rows ── */
       .joint-row {
         display: flex; justify-content: space-between; align-items: center;
-        padding: 5px 0;
+        padding: 6px 6px;
+        border-radius: 5px;
         border-bottom: 1px solid rgba(255,102,0,0.07);
         font-size: 10px;
+        transition: background 0.15s;
       }
       .joint-row:last-child { border-bottom: none; }
-      .joint-name { color: #6a5a4a; letter-spacing: 0.08em; }
+      .joint-row.active-joint {
+        background: rgba(255,102,0,0.1);
+        border-color: rgba(255,102,0,0.25);
+      }
+      .joint-row.active-joint .joint-name { color: #ff8833; }
+      .joint-name { color: #5a4a3a; letter-spacing: 0.08em; }
       .joint-val  { color: #ff8833; font-variant-numeric: tabular-nums; min-width: 52px; text-align: right; }
 
-      /* ── Active joint label ── */
-      #joint-label {
-        position: absolute; top: 20px; right: 20px;
-        background: rgba(8,8,8,0.88);
-        border: 1px solid rgba(255,102,0,0.4);
-        border-radius: 8px;
-        padding: 8px 14px;
-        font-size: 11px; font-weight: 700;
-        color: #ff6600;
-        letter-spacing: 0.14em;
-        opacity: 0;
-        transition: opacity 0.15s ease;
-        pointer-events: none;
-        font-family: 'JetBrains Mono', monospace;
-        box-shadow: 0 0 20px rgba(255,102,0,0.15);
+      .section-divider {
+        margin: 12px 0 10px;
+        border-top: 1px solid rgba(255,102,0,0.1);
+        padding-top: 10px;
       }
 
-      /* ── Hints ── */
-      .hints {
-        margin-top: 12px; padding-top: 10px;
-        border-top: 1px solid rgba(255,102,0,0.1);
-      }
       .hint-row {
         display: flex; align-items: center; gap: 8px;
         margin-bottom: 5px; font-size: 10px; color: #5a4a3a;
@@ -94,15 +86,105 @@
         background: rgba(255,102,0,0.08);
         border: 1px solid rgba(255,102,0,0.2);
         border-radius: 4px; padding: 1px 6px;
-        font-size: 9px; color: #ff6600;
-        letter-spacing: 0.06em;
+        font-size: 9px; color: #ff6600; letter-spacing: 0.06em;
+        white-space: nowrap;
       }
 
+      /* ── Controller panel ── */
+      #ctrl-panel {
+        top: 20px; right: 20px;
+        padding: 14px 16px;
+        min-width: 230px;
+        z-index: 10;
+      }
+
+      .ctrl-title {
+        font-size: 10px; font-weight: 700;
+        color: #ff6600; letter-spacing: 0.18em;
+        text-transform: uppercase; margin-bottom: 12px;
+        display: flex; align-items: center; gap: 8px;
+      }
+      .ctrl-title::before {
+        content: ''; width: 6px; height: 6px;
+        background: #ff6600; border-radius: 50%;
+        box-shadow: 0 0 8px #ff6600;
+      }
+
+      .ctrl-row {
+        display: flex; align-items: center; gap: 10px;
+        padding: 7px 0;
+        border-bottom: 1px solid rgba(255,102,0,0.07);
+        font-size: 10px;
+      }
+      .ctrl-row:last-of-type { border-bottom: none; }
+
+      .ctrl-dot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: #2a2a2a;
+        border: 1px solid #333;
+        flex-shrink: 0;
+        transition: background 0.2s, box-shadow 0.2s;
+      }
+      .ctrl-row.connected .ctrl-dot {
+        background: #ff6600;
+        box-shadow: 0 0 6px #ff6600;
+      }
+
+      .ctrl-info { display: flex; flex-direction: column; gap: 2px; }
+      .ctrl-type { font-size: 9px; font-weight: 700; color: #ff6600; letter-spacing: 0.1em; text-transform: uppercase; }
+      .ctrl-label { font-size: 9px; color: #5a4a3a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
+
+      .ctrl-btn {
+        margin-top: 10px; width: 100%;
+        background: rgba(255,102,0,0.1);
+        border: 1px solid rgba(255,102,0,0.3);
+        border-radius: 6px;
+        color: #ff8833; font-family: inherit;
+        font-size: 10px; letter-spacing: 0.1em;
+        padding: 7px 0; cursor: pointer;
+        text-transform: uppercase;
+        transition: background 0.15s, border-color 0.15s;
+      }
+      .ctrl-btn:hover { background: rgba(255,102,0,0.2); border-color: rgba(255,102,0,0.6); }
+      .ctrl-btn:active { background: rgba(255,102,0,0.3); }
+
+      /* Active joint → shown when gamepad right stick moves */
+      .gp-active-joint {
+        margin-top: 10px; padding-top: 10px;
+        border-top: 1px solid rgba(255,102,0,0.1);
+        font-size: 9px; color: #5a4a3a;
+        display: flex; justify-content: space-between; align-items: center;
+      }
+      #ctrl-joint-name { color: #ff8833; font-weight: 700; letter-spacing: 0.08em; }
+
+      /* Gamepad hint table */
+      .gp-hints { margin-top: 10px; border-top: 1px solid rgba(255,102,0,0.08); padding-top: 10px; }
+      .gp-hint-row { display: flex; gap: 8px; margin-bottom: 4px; font-size: 9px; color: #5a4a3a; align-items: center; }
+      .gp-key {
+        background: rgba(255,102,0,0.07); border: 1px solid rgba(255,102,0,0.18);
+        border-radius: 3px; padding: 1px 5px; color: #cc5500;
+        font-size: 8px; white-space: nowrap; letter-spacing: 0.05em;
+      }
+
+      /* ── Active joint floating label ── */
+      #joint-label {
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(6,6,6,0.9);
+        border: 1px solid rgba(255,102,0,0.5);
+        border-radius: 8px; padding: 8px 18px;
+        font-size: 13px; font-weight: 700;
+        color: #ff6600; letter-spacing: 0.16em;
+        opacity: 0; transition: opacity 0.12s;
+        pointer-events: none;
+        box-shadow: 0 0 24px rgba(255,102,0,0.2);
+      }
+
+      /* ── Corner badge ── */
       #corner-badge {
         position: absolute; bottom: 20px; right: 20px;
         font-size: 9px; letter-spacing: 0.22em;
-        color: rgba(255,102,0,0.18);
-        text-transform: uppercase; user-select: none;
+        color: rgba(255,102,0,0.15); text-transform: uppercase; user-select: none;
       }
     </style>
   </head>
@@ -110,35 +192,75 @@
     <div id="arm-container">
       <canvas id="arm-canvas"></canvas>
 
-      <div id="arm-ui">
+      <!-- Joint control panel -->
+      <div id="arm-ui" class="panel">
         <div class="ui-title">Joint Control</div>
 
-        <div class="joint-row">
+        <div class="joint-row" id="row-Turntable">
           <span class="joint-name">TURNTABLE</span>
           <span class="joint-val" id="jv-Turntable">0.0°</span>
         </div>
-        <div class="joint-row">
+        <div class="joint-row" id="row-Upper-Arm">
           <span class="joint-name">UPPER ARM</span>
           <span class="joint-val" id="jv-Upper-Arm">0.0°</span>
         </div>
-        <div class="joint-row">
+        <div class="joint-row" id="row-Fore-Arm">
           <span class="joint-name">FORE ARM</span>
           <span class="joint-val" id="jv-Fore-Arm">0.0°</span>
         </div>
-        <div class="joint-row">
+        <div class="joint-row" id="row-Wrist">
           <span class="joint-name">WRIST</span>
           <span class="joint-val" id="jv-Wrist">0.0°</span>
         </div>
 
-        <div class="hints">
-          <div class="hint-row"><span class="hint-key">drag part</span><span>pose joint</span></div>
-          <div class="hint-row"><span class="hint-key">drag bg</span><span>orbit camera</span></div>
+        <div class="section-divider">
+          <div class="hint-row"><span class="hint-key">click part</span><span>select joint</span></div>
+          <div class="hint-row"><span class="hint-key">drag</span><span>pose / orbit</span></div>
           <div class="hint-row"><span class="hint-key">scroll</span><span>zoom</span></div>
         </div>
       </div>
 
+      <!-- Controller panel -->
+      <div id="ctrl-panel" class="panel">
+        <div class="ctrl-title">Controllers</div>
+
+        <div class="ctrl-row" id="ctrl-xbox">
+          <div class="ctrl-dot"></div>
+          <div class="ctrl-info">
+            <span class="ctrl-type">Xbox / Gamepad</span>
+            <span class="ctrl-label">No controller</span>
+          </div>
+        </div>
+
+        <div class="ctrl-row" id="ctrl-arduino">
+          <div class="ctrl-dot"></div>
+          <div class="ctrl-info">
+            <span class="ctrl-type">Arduino Serial</span>
+            <span class="ctrl-label">Not connected</span>
+          </div>
+        </div>
+
+        <button class="ctrl-btn" id="arduino-btn" onclick="connectArduino()">
+          ⬡ Connect Arduino
+        </button>
+
+        <div class="gp-active-joint">
+          <span>Active joint</span>
+          <span id="ctrl-joint-name">TURNTABLE</span>
+        </div>
+
+        <div class="gp-hints">
+          <div class="gp-hint-row"><span class="gp-key">L stick</span><span>orbit camera</span></div>
+          <div class="gp-hint-row"><span class="gp-key">R stick X</span><span>rotate joint</span></div>
+          <div class="gp-hint-row"><span class="gp-key">R stick Y</span><span>zoom</span></div>
+          <div class="gp-hint-row"><span class="gp-key">LB / RB</span><span>prev / next joint</span></div>
+          <div class="gp-hint-row"><span class="gp-key">A</span><span>reset joints</span></div>
+          <div class="gp-hint-row"><span class="gp-key">Y</span><span>reset camera</span></div>
+        </div>
+      </div>
+
       <div id="joint-label"></div>
-      <div id="corner-badge">budx · v0.2</div>
+      <div id="corner-badge">budx · v0.3</div>
     </div>
 
     <script type="module" src="/src/main.js"></script>
