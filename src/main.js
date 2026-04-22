@@ -437,7 +437,7 @@ function pollGamepad() {
         }
 
         gpPrev.rb = rb; gpPrev.lb = lb; gpPrev.a = a; gpPrev.y = y;
-        break; // use first connected gamepad only
+        break;
     }
 }
 
