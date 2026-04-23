@@ -231,7 +231,7 @@ function highlight(mesh, on) {
 // ─── Orbit ───────────────────────────────────────────────────────────────────
 const orbit = { theta:0.6, phi:0.38, radius:18, target:new THREE.Vector3(0,6,0), tV:0, pV:0 };
 let isDragging=false, mode='orbit', activeJoint=null, lastX=0, lastY=0;
-const DRAG_SPEED=0.007, JOINT_SPEED=0.018, INERTIA=0.86, MIN_PHI=0.05, MAX_PHI=Math.PI/2-0.02;
+const DRAG_SPEED=0.007, JOINT_SPEED=0.0035, INERTIA=0.86, MIN_PHI=0.05, MAX_PHI=Math.PI/2-0.02;
 canvas.style.cursor='grab';
 
 canvas.addEventListener('mousedown', e => {
