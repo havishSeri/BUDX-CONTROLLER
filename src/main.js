@@ -105,11 +105,11 @@ turntablePivot.position.set(0, 0, 0);
 rootGroup.add(turntablePivot);
 
 const upperArmPivot = new THREE.Group();
-upperArmPivot.position.set(0, 3.267, 0);
+upperArmPivot.position.set(0, 0, 0);
 turntablePivot.add(upperArmPivot);
 
 const foreArmPivot = new THREE.Group();
-foreArmPivot.position.set(0, 8.425, 0);
+foreArmPivot.position.set(0, 0, 0);
 upperArmPivot.add(foreArmPivot);
 
 const wristPivot = new THREE.Group();
@@ -354,10 +354,10 @@ const anim = {
 const PRESETS = {
     'Wave': [
         {time:0,    angles:[0,   0,    0,    0]},
-        {time:0.5,  angles:[0,   0.5,  0,    0.3]},
-        {time:1.0,  angles:[0,   0,   -0.3,  -0.3]},
         {time:1.5,  angles:[0,   0.5,  0,    0.3]},
-        {time:2.0,  angles:[0,   0,    0,    0]},
+        {time:2.0,  angles:[0,   0,   -0.3,  -0.3]},
+        {time:3.5,  angles:[0,   0.5,  0,    0.3]},
+        {time:4.0,  angles:[0,   0,    0,    0]},
     ],
     'Sweep': [
         {time:0,   angles:[0,      0.2, 0, 0]},
