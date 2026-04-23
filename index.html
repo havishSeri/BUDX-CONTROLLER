@@ -107,6 +107,51 @@
     .gp-hint-row{display:flex;gap:8px;margin-bottom:3px;font-size:9px;color:#5a4a3a;align-items:center;}
     .gp-key{background:rgba(255,102,0,.07);border:1px solid rgba(255,102,0,.18);border-radius:3px;padding:1px 5px;color:#cc5500;font-size:8px;white-space:nowrap;}
 
+    /* ── Hand Tracking panel ── */
+    #cam-panel{bottom:20px;right:20px;padding:14px 16px;width:260px;}
+
+    /* Preview: fixed size set by JS resize; video CSS-mirrored (selfie), canvas NOT mirrored */
+    #ht-preview{
+      position:relative;width:228px;height:128px;
+      border-radius:6px;overflow:hidden;
+      background:#0a0a0a;border:1px solid rgba(255,102,0,0.15);
+      margin-bottom:10px;user-select:none;
+    }
+    #ht-video{
+      position:absolute;top:0;left:0;width:100%;height:100%;
+      object-fit:cover;
+      transform:scaleX(-1); /* mirror so it feels like a selfie cam */
+      display:block;
+    }
+    /* Canvas draws in un-mirrored coordinate space, then we flip X ourselves in JS
+       so skeleton appears correctly over the mirrored video */
+    #ht-canvas{
+      position:absolute;top:0;left:0;width:100%;height:100%;
+      pointer-events:none;
+    }
+    #ht-status{
+      position:absolute;bottom:4px;left:6px;font-size:9px;
+      color:rgba(255,102,0,0.7);letter-spacing:.08em;pointer-events:none;
+      text-shadow:0 1px 4px rgba(0,0,0,0.9);
+    }
+    /* Drag-resize handle at bottom-right corner */
+    #ht-resize-handle{
+      position:absolute;bottom:0;right:0;
+      width:18px;height:18px;cursor:nwse-resize;z-index:6;
+      /* Visual triangle hint */
+      background:
+        linear-gradient(135deg, transparent 45%, rgba(255,102,0,0.5) 45%,
+                                rgba(255,102,0,0.5) 55%, transparent 55%),
+        linear-gradient(135deg, transparent 60%, rgba(255,102,0,0.35) 60%,
+                                rgba(255,102,0,0.35) 70%, transparent 70%),
+        linear-gradient(135deg, transparent 75%, rgba(255,102,0,0.2) 75%,
+                                rgba(255,102,0,0.2) 85%, transparent 85%);
+    }
+
+    .ht-controls{display:flex;gap:5px;margin-bottom:8px;}
+    .ht-mapping{font-size:9px;color:#5a4a3a;line-height:1.8;letter-spacing:.04em;}
+    .ht-mapping span{color:#7a5a3a;}
+
     /* ── Fullscreen ── */
     #fullscreen-btn{
       position:absolute;bottom:20px;right:20px;width:36px;height:36px;
@@ -197,10 +242,40 @@
     </div>
   </div>
 
+  <!-- Hand Tracking panel -->
+  <div id="cam-panel" class="panel">
+    <div class="panel-title">Hand Tracking</div>
+
+    <div id="ht-preview">
+      <video id="ht-video" autoplay muted playsinline></video>
+      <canvas id="ht-canvas"></canvas>
+      <div id="ht-status">CAMERA OFF</div>
+      <div id="ht-resize-handle" title="Drag to resize preview"></div>
+    </div>
+
+    <div class="ht-controls">
+      <button class="anim-btn" id="ht-toggle-btn" onclick="toggleHandTracking()" style="flex:1.5;">◎ Enable</button>
+      <button class="anim-btn" id="ht-smooth-btn" onclick="toggleHtSmoothing()">~ Smooth</button>
+      <button class="anim-btn" id="ht-blur-btn"   onclick="toggleFaceBlur()">⬡ Face</button>
+    </div>
+
+    <div class="ht-mapping">
+      <div>palm X <span>→ turntable</span></div>
+      <div>palm Y <span>→ upper arm</span></div>
+      <div>wrist tilt <span>→ fore arm</span></div>
+      <div>index curl <span>→ wrist</span></div>
+    </div>
+  </div>
+
   <div id="joint-label"></div>
   <button id="fullscreen-btn" onclick="toggleFullscreen()" title="Fullscreen">⊡</button>
-  <div id="corner-badge">budx · v0.5</div>
+  <div id="corner-badge">budx · v0.7</div>
 </div>
+
+<!-- MediaPipe -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
 <script type="module" src="/src/main.js"></script>
 </body>
 </html>
